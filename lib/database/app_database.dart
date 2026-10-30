@@ -24,7 +24,13 @@ class AppDatabase {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'kain_check.db');
 
-    final db = await openDatabase(path, version: 1, onCreate: _createTables);
+    final db = await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createTables,
+      onUpgrade: _onUpgrade,
+      onOpen: _ensureMealLogsTable,
+    );
 
     final count =
         Sqflite.firstIntValue(
@@ -61,17 +67,7 @@ class AppDatabase {
       )
     ''');
 
-    await db.execute('''
-      CREATE TABLE meal_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        food_id INTEGER NOT NULL,
-        food_name TEXT NOT NULL,
-        meal_type TEXT NOT NULL,
-        servings REAL NOT NULL,
-        price_paid REAL NOT NULL,
-        date_eaten TEXT NOT NULL
-      )
-    ''');
+    await _createMealLogsTable(db);
 
     await db.execute('''
       CREATE TABLE user_settings (
@@ -90,6 +86,30 @@ class AppDatabase {
     });
   }
 
+  Future<void> _createMealLogsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meal_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        food_id INTEGER NOT NULL,
+        food_name TEXT NOT NULL,
+        meal_type TEXT NOT NULL,
+        servings REAL NOT NULL,
+        price_paid REAL NOT NULL,
+        date_eaten TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createMealLogsTable(db);
+    }
+  }
+
+  Future<void> _ensureMealLogsTable(Database db) async {
+    await _createMealLogsTable(db);
+  }
+
   Future<int> insertFood(Food food) async {
     final db = await database;
     final data = food.toMap();
@@ -100,7 +120,6 @@ class AppDatabase {
 
   Future<List<Food>> getFoods() async {
     final db = await database;
-
     final result = await db.query('foods', orderBy: 'name ASC');
 
     return result.map((map) => Food.fromMap(map)).toList();

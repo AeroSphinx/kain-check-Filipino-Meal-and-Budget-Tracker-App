@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/food_provider.dart';
+import 'providers/meal_log_provider.dart';
+import 'screens/meal_logging_page.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => FoodProvider()..loadFoods(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FoodProvider()..loadFoods()),
+        ChangeNotifierProvider(
+          create: (_) => MealLogProvider()..loadMealLogs(),
+        ),
+      ],
       child: const KainCheckApp(),
     ),
   );
@@ -24,7 +31,45 @@ class KainCheckApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const FoodSuggestionPage(),
+      home: const HomeNavigationPage(),
+    );
+  }
+}
+
+class HomeNavigationPage extends StatefulWidget {
+  const HomeNavigationPage({super.key});
+
+  @override
+  State<HomeNavigationPage> createState() => _HomeNavigationPageState();
+}
+
+class _HomeNavigationPageState extends State<HomeNavigationPage> {
+  int selectedIndex = 0;
+
+  final List<Widget> pages = const [FoodSuggestionPage(), MealLoggingPage()];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: selectedIndex, children: pages),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            selectedIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Food Suggestions',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.receipt_long),
+            label: 'Meal Logging',
+          ),
+        ],
+      ),
     );
   }
 }
