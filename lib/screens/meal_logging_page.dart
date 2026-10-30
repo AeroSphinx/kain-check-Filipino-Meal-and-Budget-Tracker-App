@@ -39,9 +39,7 @@ class _MealLoggingPageState extends State<MealLoggingPage> {
         price == null ||
         price < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter valid meal information.'),
-        ),
+        const SnackBar(content: Text('Please enter valid meal information.')),
       );
       return;
     }
@@ -64,15 +62,14 @@ class _MealLoggingPageState extends State<MealLoggingPage> {
     if (!mounted) return;
 
     if (mealProvider.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mealProvider.errorMessage!)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(mealProvider.errorMessage!)));
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Meal saved successfully!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Meal saved successfully!')));
 
     servingsController.text = '1';
     priceController.clear();
@@ -93,10 +90,7 @@ class _MealLoggingPageState extends State<MealLoggingPage> {
                 children: [
                   const Text(
                     'Record Your Meal',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   const Text('Select Food'),
@@ -129,18 +123,9 @@ class _MealLoggingPageState extends State<MealLoggingPage> {
                         value: 'Breakfast',
                         child: Text('Breakfast'),
                       ),
-                      DropdownMenuItem(
-                        value: 'Lunch',
-                        child: Text('Lunch'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Dinner',
-                        child: Text('Dinner'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Snack',
-                        child: Text('Snack'),
-                      ),
+                      DropdownMenuItem(value: 'Lunch', child: Text('Lunch')),
+                      DropdownMenuItem(value: 'Dinner', child: Text('Dinner')),
+                      DropdownMenuItem(value: 'Snack', child: Text('Snack')),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -181,10 +166,7 @@ class _MealLoggingPageState extends State<MealLoggingPage> {
                   const SizedBox(height: 30),
                   const Text(
                     "Today's Meal History",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   if (mealProvider.isLoading)
